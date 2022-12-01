@@ -10,13 +10,11 @@ int	main(int argc, char **argv)
 
 
 	i = 0;
-	ft_printf("str: %s\n", argv[1]);
 	while (argv[1] && argv[1][i])
 	{
 		c = argv[1][i];
 		bit = 128;
 		j = 0;
-		ft_printf("c: %c, decimal: %d\n", c, c);
 		while (bit > 0)
 		{
 			if (c & bit)
@@ -28,6 +26,18 @@ int	main(int argc, char **argv)
 		}
 		str[j] = '\0';
 		ft_printf("%s\n", str);
+		ft_printf("c: %c, decimal: %d\n", c, c);
+		// binary to unsigned char
+		c = 0;
+		j = 0;
+		while (str[j])
+		{
+			c <<= 1;
+			if (str[j] == '1')
+				c |= 1;
+			j++;
+		}
+		ft_printf("c: %c, decimal: %d\n", c, c);
 		i++;
 	}
 
