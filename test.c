@@ -38,6 +38,7 @@ int	main(int argc, char **argv)
 			j++;
 		}
 		ft_printf("c: %c, decimal: %d\n", c, c);
+		// ft_printf("%c", c);
 		i++;
 	}
 
