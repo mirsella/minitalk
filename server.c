@@ -2,32 +2,32 @@
 #include "libft/libft.h"
 #include "unistd.h"
 
+// https://openclassrooms.com/fr/courses/4117396-developpez-en-c-pour-lembarque/4633446-manipulez-les-registres-et-les-masques
 void    sig_handler(int signo, siginfo_t *info, void *context)
 {
-	static int		i = 0;
-	static unsigned char		c = 0;
+	static int				i = 0;
+	static unsigned char	c = 0;
 	(void)context;
-	(void)info;
 
 	if (signo == SIGUSR2)
 	{
-		ft_printf("received SIGUSR2: 1\n");
+		// ft_printf("received SIGUSR2: 1\n");
 		c <<= 1;
 		c |= 1;
-		i++;
 	}
 	else if (signo == SIGUSR1)
 	{
-		ft_printf("received SIGUSR1: 0\n");
+		// ft_printf("received SIGUSR1: 0\n");
 		c <<= 1;
-		i++;
 	}
+	i++;
 	if (i == 8)
 	{
 		ft_printf("%c", c);
 		i = 0;
 		c = 0;
 	}
+	kill(info->si_pid, SIGUSR1);
 }
 
 int	main(void)
