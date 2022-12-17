@@ -6,7 +6,7 @@
 /*   By: mirsella <mirsella@protonmail.com>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/09 15:41:50 by mirsella          #+#    #+#             */
-/*   Updated: 2022/12/09 18:03:41 by mirsella         ###   ########.fr       */
+/*   Updated: 2022/12/17 23:30:24 by mirsella         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,48 +15,51 @@
 #include "unistd.h"
 #include "stdlib.h"
 
-char	*g_str = NULL;
+int		g_oldpid = 0;
+int counter = 0;
 
-char	*store_char(char c, int reset)
+char	*ft_realloc(char *str, size_t msize)
 {
-	static size_t			mallocsize = 25;
-	char					*tmp;
+	char	*new;
 
-	if (reset)
+	new = ft_calloc(msize, sizeof(char));
+	if (str)
 	{
-		mallocsize = 25;
-		free(g_str);
-		g_str = NULL;
+		ft_strlcpy(new, str, ft_strlen(str));
+		free(str);
+		str = NULL;
 	}
-	if (!g_str || ft_strlen(g_str) >= mallocsize)
-	{
-		mallocsize *= 2;
-		tmp = g_str;
-		g_str = ft_calloc(sizeof(char), mallocsize);
-		if (!g_str)
-			return (NULL);
-		if (tmp)
-			ft_strlcpy(g_str, tmp, mallocsize);
-		free(tmp);
-	}
-	g_str[ft_strlen(g_str)] = c;
-	return (g_str);
+	return (new);
 }
 
-void	handle_char(char c, int pid, int reset)
+void	handle_char(char c, int pid)
 {
-	store_char(c, reset);
+	static char		*str = NULL;
+	static size_t	msize = 50;
+
+	if (g_oldpid != pid)
+	{
+		msize = 50;
+		free(str);
+		str = ft_calloc(msize, sizeof(char));
+		return ;
+	}
 	if (c == 0)
 	{
-		if (ft_printf("%s", g_str) == -1)
-			kill(pid, SIGUSR2);
-		free(g_str);
-		g_str = NULL;
+		ft_putstr(str);
+		msize = 50;
+		free(str);
+		str = NULL;
+		// str = ft_calloc(msize, sizeof(char));
 	}
 	else
 	{
-		if (!store_char(c, reset))
-			kill(pid, SIGUSR2);
+		if (ft_strlen(str) + 1 >= msize)
+		{
+			msize *= 2;
+			str = ft_realloc(str, msize);
+		}
+		str[ft_strlen(str)] = c;
 	}
 }
 
@@ -64,15 +67,15 @@ void	sig_handler(int signo, siginfo_t *info, void *context)
 {
 	static int				i = 0;
 	static unsigned char	c = 0;
-	static int				pid = 0;
 
 	(void)context;
-	if (pid != info->si_pid)
+	counter++;
+	// ft_printf("sig %d\n", counter);
+	if (g_oldpid != info->si_pid)
 	{
+		// handle_char(0, info->si_pid);
 		i = 0;
 		c = 0;
-		free(g_str);
-		g_str = NULL;
 	}
 	if (signo == SIGUSR2)
 	{
@@ -80,35 +83,32 @@ void	sig_handler(int signo, siginfo_t *info, void *context)
 		c |= 1;
 	}
 	else if (signo == SIGUSR1)
-	{
 		c <<= 1;
-	}
 	i++;
 	if (i == 8)
 	{
-		handle_char(c, info->si_pid, pid != info->si_pid);
-		// ft_putchar(c);
+		// handle_char(c, info->si_pid);
+		ft_printf("c: %c, sig N%d\n", c, counter);
 		i = 0;
 		c = 0;
 	}
-	pid = info->si_pid;
+	g_oldpid = info->si_pid;
 	kill(info->si_pid, SIGUSR1);
 }
 
-int	main(void)
+int		main(void)
 {
 	struct sigaction	act;
 
 	ft_printf("pid: %d\n", getpid());
-	sigemptyset(&act.sa_mask);
-	sigaddset(&act.sa_mask, SIGUSR1);
-	sigaddset(&act.sa_mask, SIGUSR2);
+	// sigemptyset(&act.sa_mask);
+	// sigaddset(&act.sa_mask, SIGUSR1);
+	// sigaddset(&act.sa_mask, SIGUSR2);
+	// sigaddset(&act.sa_mask, SIGINT);
 	act.sa_sigaction = sig_handler;
 	act.sa_flags = SA_SIGINFO;
 	sigaction(SIGUSR1, &act, NULL);
 	sigaction(SIGUSR2, &act, NULL);
 	while (1)
-	{
 		sleep(1);
-	}
 }

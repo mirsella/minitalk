@@ -6,7 +6,7 @@
 /*   By: mirsella <mirsella@protonmail.com>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/09 15:41:53 by mirsella          #+#    #+#             */
-/*   Updated: 2022/12/09 17:47:54 by mirsella         ###   ########.fr       */
+/*   Updated: 2022/12/17 23:21:54 by mirsella         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ void	send_char(char c, int pid)
 {
 	int		bit;
 
-	// ft_printf("Sending char: %c\n", c);
+	ft_printf("Sending char: '%c'\n", c);
 	bit = 128;
 	while (bit > 0)
 	{
@@ -42,8 +42,8 @@ void	send_char(char c, int pid)
 			kill(pid, SIGUSR2);
 		else
 			kill(pid, SIGUSR1);
-		pause();
 		bit >>= 1;
+		pause();
 	}
 }
 
