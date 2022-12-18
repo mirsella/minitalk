@@ -6,7 +6,7 @@
 /*   By: mirsella <mirsella@protonmail.com>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/09 15:41:53 by mirsella          #+#    #+#             */
-/*   Updated: 2022/12/17 23:21:54 by mirsella         ###   ########.fr       */
+/*   Updated: 2022/12/18 00:50:23 by mirsella         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,43 +14,51 @@
 #include "libft/libft.h"
 #include "unistd.h"
 #include "stdlib.h"
+#include "minitalk_client.h"
 
-int	g_counter = 0;
+t_client	g_client;
+
+void	send_byte(unsigned char c)
+{
+	int	i;
+
+	if (c & g_client.bit)
+		i = kill(g_client.pid, SIGUSR2);
+	else
+		i = kill(g_client.pid, SIGUSR1);
+	if (i == -1)
+		ft_putstr("could not send signal");
+	g_client.bit >>= 1;
+}
 
 void	sig_handler(int signo)
 {
 	if (signo == SIGUSR1)
 	{
-		g_counter++;
+		if (g_client.bit == 0)
+		{
+			if (g_client.str[g_client.i] == 0)
+			{
+				ft_printf("Message sent to server");
+				exit(0);
+			}
+			else
+				g_client.i++;
+			g_client.bit = 128;
+			send_byte(g_client.str[g_client.i]);
+		}
+		else
+			send_byte(g_client.str[g_client.i]);
 	}
 	else if (signo == SIGUSR2)
 	{
-		ft_printf("Encountered a error");
+		ft_printf("Server sent an error");
 		exit(1);
-	}
-}
-
-void	send_char(char c, int pid)
-{
-	int		bit;
-
-	ft_printf("Sending char: '%c'\n", c);
-	bit = 128;
-	while (bit > 0)
-	{
-		if (c & bit)
-			kill(pid, SIGUSR2);
-		else
-			kill(pid, SIGUSR1);
-		bit >>= 1;
-		pause();
 	}
 }
 
 int	main(int argc, char **argv)
 {
-	int					i;
-
 	if (argc != 3)
 	{
 		ft_printf("usage: ./client [pid] [string]\n");
@@ -58,12 +66,11 @@ int	main(int argc, char **argv)
 	}
 	signal(SIGUSR1, sig_handler);
 	signal(SIGUSR2, sig_handler);
-	i = 0;
-	while (argv[2][i])
-		send_char(argv[2][i++], ft_atoi(argv[1]));
-	send_char(argv[2][i++], ft_atoi(argv[1]));
-	if (g_counter == i * 8)
-		ft_printf("Message sent\n");
-	else
-		ft_printf("Message not sent. sent: %d, received %d\n", i, g_counter);
+	g_client.pid = ft_atoi(argv[1]);
+	g_client.str = argv[2];
+	g_client.i = 0;
+	g_client.bit = 128;
+	send_byte(g_client.str[g_client.i]);
+	while (1)
+		sleep(1);
 }

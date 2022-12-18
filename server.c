@@ -6,7 +6,7 @@
 /*   By: mirsella <mirsella@protonmail.com>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/09 15:41:50 by mirsella          #+#    #+#             */
-/*   Updated: 2022/12/17 23:30:24 by mirsella         ###   ########.fr       */
+/*   Updated: 2022/12/18 00:25:59 by mirsella         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,7 +73,7 @@ void	sig_handler(int signo, siginfo_t *info, void *context)
 	// ft_printf("sig %d\n", counter);
 	if (g_oldpid != info->si_pid)
 	{
-		// handle_char(0, info->si_pid);
+		handle_char(0, info->si_pid);
 		i = 0;
 		c = 0;
 	}
@@ -87,8 +87,8 @@ void	sig_handler(int signo, siginfo_t *info, void *context)
 	i++;
 	if (i == 8)
 	{
-		// handle_char(c, info->si_pid);
-		ft_printf("c: %c, sig N%d\n", c, counter);
+		handle_char(c, info->si_pid);
+		// ft_printf("c: %c, sig N%d\n", c, counter);
 		i = 0;
 		c = 0;
 	}
