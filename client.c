@@ -6,14 +6,10 @@
 /*   By: mirsella <mirsella@protonmail.com>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/09 15:41:53 by mirsella          #+#    #+#             */
-/*   Updated: 2022/12/18 00:50:23 by mirsella         ###   ########.fr       */
+/*   Updated: 2022/12/18 10:11:49 by mirsella         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <signal.h>
-#include "libft/libft.h"
-#include "unistd.h"
-#include "stdlib.h"
 #include "minitalk_client.h"
 
 t_client	g_client;

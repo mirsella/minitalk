@@ -6,7 +6,7 @@
 /*   By: mirsella <mirsella@protonmail.com>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/09 15:41:50 by mirsella          #+#    #+#             */
-/*   Updated: 2022/12/18 00:25:59 by mirsella         ###   ########.fr       */
+/*   Updated: 2022/12/18 10:50:14 by mirsella         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,6 @@
 #include "stdlib.h"
 
 int		g_oldpid = 0;
-int counter = 0;
 
 char	*ft_realloc(char *str, size_t msize)
 {
@@ -37,12 +36,11 @@ void	handle_char(char c, int pid)
 	static char		*str = NULL;
 	static size_t	msize = 50;
 
-	if (g_oldpid != pid)
+	if (g_oldpid != pid || !str)
 	{
+		g_oldpid = pid;
 		msize = 50;
-		free(str);
-		str = ft_calloc(msize, sizeof(char));
-		return ;
+		str = ft_realloc(NULL, msize);
 	}
 	if (c == 0)
 	{
@@ -50,7 +48,6 @@ void	handle_char(char c, int pid)
 		msize = 50;
 		free(str);
 		str = NULL;
-		// str = ft_calloc(msize, sizeof(char));
 	}
 	else
 	{
@@ -69,8 +66,6 @@ void	sig_handler(int signo, siginfo_t *info, void *context)
 	static unsigned char	c = 0;
 
 	(void)context;
-	counter++;
-	// ft_printf("sig %d\n", counter);
 	if (g_oldpid != info->si_pid)
 	{
 		handle_char(0, info->si_pid);
@@ -88,7 +83,7 @@ void	sig_handler(int signo, siginfo_t *info, void *context)
 	if (i == 8)
 	{
 		handle_char(c, info->si_pid);
-		// ft_printf("c: %c, sig N%d\n", c, counter);
+		// ft_putchar(c);
 		i = 0;
 		c = 0;
 	}
