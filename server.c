@@ -6,13 +6,35 @@
 /*   By: mirsella <mirsella@protonmail.com>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/09 15:41:50 by mirsella          #+#    #+#             */
-/*   Updated: 2022/12/21 16:27:40 by mirsella         ###   ########.fr       */
+/*   Updated: 2022/12/21 16:41:59 by mirsella         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minitalk_server.h"
+#include <signal.h>
+#include "libft/libft.h"
+#include "unistd.h"
+#include "stdlib.h"
 
 int		g_oldpid = 0;
+
+char	*ft_realloc(char *str, size_t msize, int pid)
+{
+	char	*new;
+
+	new = ft_calloc(msize, sizeof(char));
+	if (!new)
+	{
+		kill(pid, SIGUSR2);
+		exit(1);
+	}
+	if (str)
+	{
+		ft_strlcpy(new, str, ft_strlen(str) + 1);
+		free(str);
+		str = NULL;
+	}
+	return (new);
+}
 
 void	handle_char(char c, int pid)
 {
