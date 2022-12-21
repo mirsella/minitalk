@@ -6,30 +6,13 @@
 /*   By: mirsella <mirsella@protonmail.com>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/09 15:41:50 by mirsella          #+#    #+#             */
-/*   Updated: 2022/12/21 15:37:49 by mirsella         ###   ########.fr       */
+/*   Updated: 2022/12/21 16:27:40 by mirsella         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <signal.h>
-#include "libft/libft.h"
-#include "unistd.h"
-#include "stdlib.h"
+#include "minitalk_server.h"
 
 int		g_oldpid = 0;
-
-char	*ft_realloc(char *str, size_t msize)
-{
-	char	*new;
-
-	new = ft_calloc(msize, sizeof(char));
-	if (str)
-	{
-		ft_strlcpy(new, str, ft_strlen(str) + 1);
-		free(str);
-		str = NULL;
-	}
-	return (new);
-}
 
 void	handle_char(char c, int pid)
 {
@@ -40,7 +23,7 @@ void	handle_char(char c, int pid)
 	{
 		g_oldpid = pid;
 		msize = 50;
-		str = ft_realloc(NULL, msize);
+		str = ft_realloc(NULL, msize, pid);
 	}
 	if (c == 0)
 	{
@@ -54,7 +37,7 @@ void	handle_char(char c, int pid)
 		if (ft_strlen(str) + 1 == msize)
 		{
 			msize *= 2;
-			str = ft_realloc(str, msize);
+			str = ft_realloc(str, msize, pid);
 		}
 		str[ft_strlen(str)] = c;
 	}
@@ -101,6 +84,7 @@ int	main(void)
 
 	ft_printf("pid: %d\n", getpid());
 	act.sa_sigaction = sig_handler;
+	sigemptyset(&act.sa_mask);
 	act.sa_flags = SA_SIGINFO;
 	sigaction(SIGUSR1, &act, NULL);
 	sigaction(SIGUSR2, &act, NULL);
