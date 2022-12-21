@@ -6,15 +6,15 @@ NAME = minitalk
 
 all: $(NAME)
 
-$(NAME): libft.a client server
+$(NAME): libft client server
 
-client: client.o libft.a
+client: client.o libft
 	$(CC) $(CFLAGS) -o client client.o -Llibft -lft
 	
-server: server.o libft.a
+server: server.o libft
 	$(CC) $(CFLAGS) -o server server.o -Llibft -lft
 
-libft.a:
+libft:
 	make -C libft
 
 clean:
