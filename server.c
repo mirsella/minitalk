@@ -6,7 +6,7 @@
 /*   By: mirsella <mirsella@protonmail.com>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/09 15:41:50 by mirsella          #+#    #+#             */
-/*   Updated: 2022/12/18 10:50:14 by mirsella         ###   ########.fr       */
+/*   Updated: 2022/12/21 15:37:49 by mirsella         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ char	*ft_realloc(char *str, size_t msize)
 	new = ft_calloc(msize, sizeof(char));
 	if (str)
 	{
-		ft_strlcpy(new, str, ft_strlen(str));
+		ft_strlcpy(new, str, ft_strlen(str) + 1);
 		free(str);
 		str = NULL;
 	}
@@ -51,12 +51,22 @@ void	handle_char(char c, int pid)
 	}
 	else
 	{
-		if (ft_strlen(str) + 1 >= msize)
+		if (ft_strlen(str) + 1 == msize)
 		{
 			msize *= 2;
 			str = ft_realloc(str, msize);
 		}
 		str[ft_strlen(str)] = c;
+	}
+}
+
+void	handle_new_pid(int *i, unsigned char *c, int pid)
+{
+	if (pid != g_oldpid)
+	{
+		*i = 0;
+		*c = 0;
+		handle_char(0, pid);
 	}
 }
 
@@ -66,12 +76,7 @@ void	sig_handler(int signo, siginfo_t *info, void *context)
 	static unsigned char	c = 0;
 
 	(void)context;
-	if (g_oldpid != info->si_pid)
-	{
-		handle_char(0, info->si_pid);
-		i = 0;
-		c = 0;
-	}
+	handle_new_pid(&i, &c, info->si_pid);
 	if (signo == SIGUSR2)
 	{
 		c <<= 1;
@@ -83,7 +88,6 @@ void	sig_handler(int signo, siginfo_t *info, void *context)
 	if (i == 8)
 	{
 		handle_char(c, info->si_pid);
-		// ft_putchar(c);
 		i = 0;
 		c = 0;
 	}
@@ -91,15 +95,11 @@ void	sig_handler(int signo, siginfo_t *info, void *context)
 	kill(info->si_pid, SIGUSR1);
 }
 
-int		main(void)
+int	main(void)
 {
 	struct sigaction	act;
 
 	ft_printf("pid: %d\n", getpid());
-	// sigemptyset(&act.sa_mask);
-	// sigaddset(&act.sa_mask, SIGUSR1);
-	// sigaddset(&act.sa_mask, SIGUSR2);
-	// sigaddset(&act.sa_mask, SIGINT);
 	act.sa_sigaction = sig_handler;
 	act.sa_flags = SA_SIGINFO;
 	sigaction(SIGUSR1, &act, NULL);
