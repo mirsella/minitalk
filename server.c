@@ -6,7 +6,7 @@
 /*   By: mirsella <mirsella@protonmail.com>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/09 15:41:50 by mirsella          #+#    #+#             */
-/*   Updated: 2022/12/21 16:41:59 by mirsella         ###   ########.fr       */
+/*   Updated: 2022/12/24 17:02:26 by mirsella         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@ char	*ft_realloc(char *str, size_t msize, int pid)
 	if (!new)
 	{
 		kill(pid, SIGUSR2);
+		free(str);
 		exit(1);
 	}
 	if (str)
