@@ -2,7 +2,6 @@ SRCS = client.c server.c
 OBJS = $(SRCS:.c=.o)
 CC = cc
 CFLAGS = -Wall -Wextra -Werror
-CFLAGS += -g3
 NAME = minitalk
 
 all: $(NAME)
