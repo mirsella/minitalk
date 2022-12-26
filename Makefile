@@ -6,7 +6,7 @@ NAME = minitalk
 
 all: $(NAME)
 
-$(NAME): libft client server
+$(NAME): libft.a client server
 
 client: client.o libft.a
 	$(CC) $(CFLAGS) -o client client.o libft/libft.a
